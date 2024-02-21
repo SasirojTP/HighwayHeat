@@ -8,9 +8,12 @@ using TMPro;
 
 public class LoginManagerScript : MonoBehaviour
 {
-    public TMP_InputField characterIdInputField;
-    public List<uint> AlternativePlayerPrefabs;
+    int playerNum = 0;
+
     public TMP_InputField userNameInputField;
+
+    public List<Transform> startPosition = new List<Transform>();
+
     private bool isApproveConnection = false;
     [Command("set-approve")]
     public bool SetIsApproveConnection()
@@ -80,6 +83,7 @@ public class LoginManagerScript : MonoBehaviour
 
     public void Host()
     {
+        playerNum = 0;
         NetworkManager.Singleton.ConnectionApprovalCallback = ApprovalCheck;
         NetworkManager.Singleton.StartHost();
         Debug.Log("start host");
@@ -113,14 +117,6 @@ public class LoginManagerScript : MonoBehaviour
                 }
             }
         }
-        else {
-            //server
-            if (NetworkManager.Singleton.IsHost)
-            {
-                string characterId = characterIdInputField.GetComponent<TMP_InputField>().text;
-                characterPrefabIndex = int.Parse(characterId);
-            }
-        }
 
         // Your approval logic determines the following values
         response.Approved = isApproved;
@@ -128,15 +124,12 @@ public class LoginManagerScript : MonoBehaviour
 
         // The Prefab hash value of the NetworkPrefab, if null the default NetworkManager player Prefab is used
         //response.PlayerPrefabHash = null;
-        //response.PlayerPrefabHash = 3917023287; // blue
-        //response.PlayerPrefabHash = 4201475902; // yellow
-        response.PlayerPrefabHash = AlternativePlayerPrefabs[characterPrefabIndex];
+        response.PlayerPrefabHash = null;
         // Position to spawn the player object (if null it uses default of Vector3.zero)
-        response.Position = Vector3.zero;
+        response.Position = startPosition[playerNum].position;
 
         // Rotation to spawn the player object (if null it uses the default of Quaternion.identity)
         response.Rotation = Quaternion.identity;
-        setSpawnLocation(clientId, response);
         NetworkLog.LogInfoServer("spawnPos of " + clientId + " is " + response.Position.ToString());
         // If response.Approved is false, you can provide a message that explains the reason why via ConnectionApprovalResponse.Reason
         // On the client-side, NetworkManager.DisconnectReason will be populated with this message via DisconnectReasonMessage
@@ -145,39 +138,14 @@ public class LoginManagerScript : MonoBehaviour
         // If additional approval steps are needed, set this to true until the additional steps are complete
         // once it transitions from true to false the connection approval response will be processed.
         response.Pending = false;
-    }
+        playerNum++;
 
-    private void setSpawnLocation(ulong clientId,
-        NetworkManager.ConnectionApprovalResponse response)
-    {
-        Vector3 spawnPos = Vector3.zero;
-        Quaternion spawnRot = Quaternion.identity;
-        //server
-        if (clientId == NetworkManager.Singleton.LocalClientId)
-        {
-            spawnPos = new Vector3(-2f, 0f, 0f); spawnRot = Quaternion.Euler(0f, 135f, 0f);
-        }
-        else
-        {
-            switch (NetworkManager.Singleton.ConnectedClients.Count)
-            {
-                case 1:
-                    spawnPos = new Vector3(0f, 0f, 0f); spawnRot = Quaternion.Euler(0f, 180f, 0f);
-                    break;
-                case 2:
-                    spawnPos = new Vector3(2f, 0f, 0f); spawnRot = Quaternion.Euler(0f, 225f, 0f);
-                    break;
-            }
-        }
-        response.Position = spawnPos;
-        response.Rotation = spawnRot;
     }
 
     public void Client()
     {
         string userName = userNameInputField.GetComponent<TMP_InputField>().text;
-        string characterId = characterIdInputField.GetComponent<TMP_InputField>().text;
-        string[] inputFields = { userName, characterId };
+        string[] inputFields = { userName };
         string clientData = HelperScript.CombineStrings(inputFields);
         NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(clientData);
         NetworkManager.Singleton.StartClient();
@@ -188,7 +156,8 @@ public class LoginManagerScript : MonoBehaviour
     {
         bool isApprove = System.String.Equals(clientData.Trim(), hostData.Trim()) ? false : true;
         Debug.Log("isApprove = " + isApprove);
-        return isApprove;
+
+        return isApprove && (playerNum < 4);
     }
 
 
