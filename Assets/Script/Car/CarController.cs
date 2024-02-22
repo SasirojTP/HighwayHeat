@@ -40,7 +40,7 @@ public class CarController : NetworkBehaviour
 
         Vector2 direction = new Vector2(horizontal,vertical);
 
-        rb.velocity = direction * speed;
+        transform.Translate(direction * speed * Time.deltaTime);
     }
 
     public void TakeDamage(float damage)

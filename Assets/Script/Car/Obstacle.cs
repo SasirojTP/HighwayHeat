@@ -1,32 +1,23 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Unity.Netcode;
 
-public class Obstacle : NetworkBehaviour
+public class Obstacle : MonoBehaviour
 {
-    public float speed = 5;
+    public float speed = 20;
     public float damage = 5;
-
-    public override void OnNetworkSpawn()
-    {
-
-    }
 
     void FixedUpdate()
     {
-        if(IsServer)
-        {
-            Move();
-        }
+        Move();
     }
 
     void Move()
     {
-        
+        transform.Translate(Vector2.left * speed * Time.deltaTime);
     }
 
-    void OnTriggerEnter(Collider other) 
+    void OnTriggerEnter2D(Collider2D other)
     {
         //make damage to car
         if(other.CompareTag("Car"))
