@@ -27,6 +27,6 @@ public class GameManager : MonoBehaviour
 
     void SetObstacleSpeed()
     {
-        obstacleSpawner.obstacleSpeed = 5f + (Mathf.Pow(2f,(elaspedTime/10f)));
+        obstacleSpawner.obstacleSpeed = 5f + (Mathf.Pow(2f,(elaspedTime/100f)));
     }
 }
