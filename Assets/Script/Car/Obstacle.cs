@@ -14,7 +14,19 @@ public class Obstacle : MonoBehaviour
 
     void Move()
     {
+        IsOutOffScreen();
         transform.Translate(Vector2.left * speed * Time.deltaTime);
+    }
+
+    void IsOutOffScreen()
+    {
+        Vector3 viewportPosition = Camera.main.WorldToViewportPoint(transform.position);
+
+        if (viewportPosition.x < 0)
+        {
+            // Destroy the object
+            Destroy(gameObject);
+        }
     }
 
     void OnTriggerEnter2D(Collider2D other)
@@ -22,8 +34,11 @@ public class Obstacle : MonoBehaviour
         //make damage to car
         if(other.CompareTag("Car"))
         {
-            other.GetComponent<CarController>().TakeDamage(damage);
-            Destroy(gameObject);
+            if(!other.GetComponent<CarController>().isDie)
+            {
+                other.GetComponent<CarController>().TakeDamage(damage);
+                Destroy(gameObject);
+            }
         }
     }
 }

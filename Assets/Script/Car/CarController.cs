@@ -10,9 +10,11 @@ public class CarController : NetworkBehaviour
 
     Rigidbody2D rb;
 
+    public bool isDie = false;
+
     public override void OnNetworkSpawn()
     {
-
+        
     }
 
     void Start()
@@ -48,16 +50,21 @@ public class CarController : NetworkBehaviour
         if(!IsOwner)
             return;
 
+        if(isDie)
+            return;
+
         hitPoint -= damage;
 
         if(hitPoint <= 0)
         {
-            GameOver();
+            GameOverRpc();
         }
     }
 
-    void GameOver()
+    [Rpc(SendTo.ClientsAndHost)]
+    void GameOverRpc()
     {
-        
+        isDie = true;
+        GetComponent<SpriteRenderer>().enabled = false;
     }
 }

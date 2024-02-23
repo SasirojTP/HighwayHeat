@@ -24,6 +24,7 @@ public class LoginManagerScript : MonoBehaviour
 
     public GameObject loginPanel;
     public GameObject leaveButton;
+
     public void Start()
     {
         NetworkManager.Singleton.OnServerStarted += HandleServerStarted;
@@ -159,6 +160,4 @@ public class LoginManagerScript : MonoBehaviour
 
         return isApprove && (playerNum < 4);
     }
-
-
 }

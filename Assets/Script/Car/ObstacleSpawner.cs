@@ -5,8 +5,10 @@ using Unity.Netcode;
 
 public class ObstacleSpawner : NetworkBehaviour
 {
-    public GameObject obstaclePrefab;
+    public Obstacle obstaclePrefab;
     public List<Transform> spawnPosition = new List<Transform>();
+
+    public float obstacleSpeed = 5;
     // Start is called before the first frame update
     void Start()
     {
@@ -22,14 +24,15 @@ public class ObstacleSpawner : NetworkBehaviour
             {
                 Vector3 spawnPos = spawnPosition[Random.Range(0,spawnPosition.Count)].position;
 
-                SpawnObstacleRpc(spawnPos);
+                SpawnObstacleRpc(spawnPos,obstacleSpeed);
             }
         }
     }
 
-    [Rpc(SendTo.Everyone)]
-    void SpawnObstacleRpc(Vector3 spawnPos)
+    [Rpc(SendTo.ClientsAndHost)]
+    void SpawnObstacleRpc(Vector3 spawnPos,float speed)
     {
-        Instantiate(obstaclePrefab,spawnPos,Quaternion.identity);
+        Obstacle _obstacle = Instantiate(obstaclePrefab,spawnPos,Quaternion.identity);
+        _obstacle.speed = speed;
     }
 }
