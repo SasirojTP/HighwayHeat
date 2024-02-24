@@ -8,7 +8,7 @@ using TMPro;
 
 public class LoginManagerScript : MonoBehaviour
 {
-    int playerNum = 0;
+    public int playerNum = 0;
 
     public TMP_InputField userNameInputField;
 
@@ -25,6 +25,8 @@ public class LoginManagerScript : MonoBehaviour
     public GameObject loginPanel;
     public GameObject leaveButton;
 
+    public GameManager gameManager;
+
     public void Start()
     {
         NetworkManager.Singleton.OnServerStarted += HandleServerStarted;
@@ -38,7 +40,7 @@ public class LoginManagerScript : MonoBehaviour
     {
         Debug.Log("HandleClientDisconnect client ID = " + clientId);
         if (NetworkManager.Singleton.IsHost) { }
-        else if (NetworkManager.Singleton.IsClient) { Leave(); }
+        else if (NetworkManager.Singleton.IsClient) {playerNum--; Leave(); }
     }
 
     public void Leave()
@@ -87,6 +89,7 @@ public class LoginManagerScript : MonoBehaviour
         playerNum = 0;
         NetworkManager.Singleton.ConnectionApprovalCallback = ApprovalCheck;
         NetworkManager.Singleton.StartHost();
+        gameManager.OnCreateServer();
         Debug.Log("start host");
     }
 
