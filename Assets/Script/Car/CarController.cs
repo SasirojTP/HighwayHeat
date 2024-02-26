@@ -11,10 +11,18 @@ public class CarController : NetworkBehaviour
     Rigidbody2D rb;
 
     public bool isDie = false;
+    public NetworkVariable<bool> isGameStart = new NetworkVariable<bool>(false,NetworkVariableReadPermission.Everyone,NetworkVariableWritePermission.Server);
 
+    Vector2 startPos;
+    float maxHitpoint;
     public override void OnNetworkSpawn()
     {
-        
+        startPos = transform.position;
+        maxHitpoint = hitPoint;
+        if(IsServer)
+        {
+            FindObjectOfType<GameManager>().carList.Add(this);
+        }
     }
 
     void Start()
@@ -37,12 +45,15 @@ public class CarController : NetworkBehaviour
 
     void Move()
     {
-        float horizontal = Input.GetAxis("Horizontal");
-        float vertical = Input.GetAxis("Vertical");
+        if(isGameStart.Value)
+        {
+            float horizontal = Input.GetAxis("Horizontal");
+            float vertical = Input.GetAxis("Vertical");
 
-        Vector2 direction = new Vector2(horizontal,vertical);
+            Vector2 direction = new Vector2(horizontal,vertical);
 
-        transform.Translate(direction * speed * Time.deltaTime);
+            transform.Translate(direction * speed * Time.deltaTime);
+        }
     }
 
     public void TakeDamage(float damage)
@@ -66,5 +77,15 @@ public class CarController : NetworkBehaviour
     {
         isDie = true;
         GetComponent<SpriteRenderer>().enabled = false;
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    public void ResetGameRpc()
+    {
+        transform.position = startPos;
+        isDie = false;
+        GetComponent<SpriteRenderer>().enabled = true;
+        hitPoint = maxHitpoint;
+        isGameStart.Value = false;
     }
 }

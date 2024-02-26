@@ -9,25 +9,15 @@ public class ObstacleSpawner : NetworkBehaviour
     public Transform spawnPosition;
 
     public float obstacleSpeed = 5;
+
+    public Coroutine spawnObstacle;
     // Start is called before the first frame update
     void Start()
     {
         
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        if(IsServer)
-        {
-            if(Input.GetKeyDown(KeyCode.Space)) //TODO run it when start game, not use get key down like this
-            {
-                StartCoroutine(StartSpawnObstacle());
-            }
-        }
-    }
-
-    IEnumerator StartSpawnObstacle()
+    public IEnumerator StartSpawnObstacle()
     {
         float waitTime = Random.Range(1,5);
         yield return new WaitForSeconds(waitTime);
@@ -36,7 +26,7 @@ public class ObstacleSpawner : NetworkBehaviour
         SpawnObstacleRpc(obstacleIndex,obstacleSpeed);
 
         if(IsServer)
-            StartCoroutine(StartSpawnObstacle());
+            spawnObstacle = StartCoroutine(StartSpawnObstacle());
     }
 
     [Rpc(SendTo.ClientsAndHost)]
@@ -47,5 +37,14 @@ public class ObstacleSpawner : NetworkBehaviour
         Obstacle _obstacle = Instantiate(obstaclePrefabs[obstacleIndex],new Vector2(spawnPosition.position.x,yPos),Quaternion.identity);
         _obstacle.speed = speed;
         _obstacle.timeElasped = yPos;
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    public void DestropAllObstacleRpc()
+    {
+        foreach(Obstacle obstacle in FindObjectsOfType<Obstacle>())
+        {
+            Destroy(obstacle.gameObject);
+        }
     }
 }
