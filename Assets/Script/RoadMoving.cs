@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class RoadMoving : MonoBehaviour
 {
-    [SerializeField] float scrollSpeed = 1f;
-    [SerializeField] float acceleration = .25f;
+    public float scrollSpeed = 1f;
+    public float acceleration = .25f;
     [SerializeField] Material roadMaterial;
     void Start()
     {
@@ -14,8 +14,8 @@ public class RoadMoving : MonoBehaviour
 
     void Update()
     {
-        float offset = Time.time * -scrollSpeed;
-        scrollSpeed += acceleration;
-        roadMaterial.mainTextureOffset = new Vector2(offset,0);
+        //float offset = Time.time * -scrollSpeed;
+        //scrollSpeed += acceleration;
+        //roadMaterial.mainTextureOffset = new Vector2(offset,0);
     }
 }

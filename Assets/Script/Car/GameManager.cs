@@ -69,7 +69,7 @@ public class GameManager : MonoBehaviour
 
     public void StartGame()
     {
-        if(loginManagerScript.playerNum < 2)
+        if(loginManagerScript.playerNum.Value < 2)
             return;
 
         playeButton.gameObject.SetActive(false);
