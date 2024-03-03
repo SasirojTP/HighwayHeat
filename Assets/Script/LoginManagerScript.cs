@@ -6,6 +6,7 @@ using Unity.Netcode;
 using UnityEngine;
 using QFSW.QC;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class LoginManagerScript : NetworkBehaviour
 {
@@ -90,6 +91,7 @@ public class LoginManagerScript : NetworkBehaviour
             NetworkManager.Singleton.Shutdown(); // shutdown
         } 
         // show login panel
+        SceneManager.LoadScene(0);
         loginPanel.SetActive(true);
         lobbyPanel.SetActive(false);
     }

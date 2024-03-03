@@ -1,11 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
-public class RoadMoving : MonoBehaviour
+public class RoadMoving : NetworkBehaviour
 {
-    public float scrollSpeed = 1f;
-    public float acceleration = .25f;
+    public NetworkVariable<float> scrollSpeed = new NetworkVariable<float>(1f,NetworkVariableReadPermission.Everyone,NetworkVariableWritePermission.Server);
+
     [SerializeField] Material roadMaterial;
     void Start()
     {
@@ -14,8 +15,7 @@ public class RoadMoving : MonoBehaviour
 
     void Update()
     {
-        //float offset = Time.time * -scrollSpeed;
-        //scrollSpeed += acceleration;
-        //roadMaterial.mainTextureOffset = new Vector2(offset,0);
+        float offset = Time.time * -scrollSpeed.Value;
+        roadMaterial.mainTextureOffset = new Vector2(offset,0);
     }
 }

@@ -9,6 +9,7 @@ public class GameManager : MonoBehaviour
     public float elaspedTime = 0;
 
     public ObstacleSpawner obstacleSpawner;
+    public RoadMoving roadMoving;
     public LoginManagerScript loginManagerScript;
 
     public Button playeButton;
@@ -37,6 +38,7 @@ public class GameManager : MonoBehaviour
             {
                 elaspedTime += Time.deltaTime;
                 SetObstacleSpeed();
+                SetRoadSpeed();
 
                 IsGameEnd();
             }
@@ -65,6 +67,11 @@ public class GameManager : MonoBehaviour
     void SetObstacleSpeed()
     {
         obstacleSpawner.obstacleSpeed = 5f + (Mathf.Pow(2f,(elaspedTime/100f)));
+    }
+
+    void SetRoadSpeed()
+    {
+        roadMoving.scrollSpeed.Value = 1f + (Mathf.Pow(2f,(elaspedTime/100f)));
     }
 
     public void StartGame()

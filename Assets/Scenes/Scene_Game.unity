@@ -679,7 +679,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 59, y: 10.637024}
+  m_AnchoredPosition: {x: 59, y: 10.636963}
   m_SizeDelta: {x: 449.745, y: 112.436}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &555416347
@@ -878,7 +878,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5117804263879553182, guid: 529fdedd32f244c0aa4acb45aafca252, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 15.398987
+      value: 15.398926
       objectReference: {fileID: 0}
     - target: {fileID: 5117804263879553182, guid: 529fdedd32f244c0aa4acb45aafca252, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -1086,7 +1086,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5117804263879553182, guid: 529fdedd32f244c0aa4acb45aafca252, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 15.398987
+      value: 15.398926
       objectReference: {fileID: 0}
     - target: {fileID: 5117804263879553182, guid: 529fdedd32f244c0aa4acb45aafca252, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -1260,6 +1260,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   elaspedTime: 0
   obstacleSpawner: {fileID: 1832761529}
+  roadMoving: {fileID: 0}
   loginManagerScript: {fileID: 360578508}
   playeButton: {fileID: 824243878}
   carList: []
@@ -1541,6 +1542,7 @@ GameObject:
   - component: {fileID: 1786716283}
   - component: {fileID: 1786716282}
   - component: {fileID: 1786716281}
+  - component: {fileID: 1786716285}
   - component: {fileID: 1786716284}
   m_Layer: 0
   m_Name: Road
@@ -1626,9 +1628,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05cb04fc44f792943891e389f64b5dcf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scrollSpeed: 1
-  acceleration: 0.0000001
+  scrollSpeed:
+    m_InternalValue: 1
   roadMaterial: {fileID: 2100000, guid: 76d76b36e64e42a47b6436773d60def2, type: 2}
+--- !u!114 &1786716285
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1786716280}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 2346389180
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
 --- !u!1 &1832761526
 GameObject:
   m_ObjectHideFlags: 0
