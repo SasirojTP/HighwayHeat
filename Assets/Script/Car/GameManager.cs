@@ -4,9 +4,10 @@ using UnityEngine;
 using UnityEngine.UI;
 using Unity.Netcode;
 
-public class GameManager : MonoBehaviour
+public class GameManager : NetworkBehaviour
 {
-    public float elaspedTime = 0;
+    public NetworkVariable<float> elaspedTime = new NetworkVariable<float>(0,NetworkVariableReadPermission.Everyone,NetworkVariableWritePermission.Server);
+
 
     public ObstacleSpawner obstacleSpawner;
     public RoadMoving roadMoving;
@@ -14,9 +15,14 @@ public class GameManager : MonoBehaviour
 
     public Button playeButton;
 
-    bool isGameStart;
+    public NetworkVariable<bool> isGameStart = new NetworkVariable<bool>(false,NetworkVariableReadPermission.Everyone,NetworkVariableWritePermission.Server);
+    public NetworkVariable<int> playerAlive = new NetworkVariable<int>(0,NetworkVariableReadPermission.Everyone,NetworkVariableWritePermission.Server);
 
     public List<CarController> carList = new List<CarController>();
+
+    public Image WinImage;
+    public Image LoseImage;
+    
 
     // Start is called before the first frame update
     public void OnCreateServer()
@@ -27,37 +33,34 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         playeButton.gameObject.SetActive(false);
+        WinImage.gameObject.SetActive(false);
+        LoseImage.gameObject.SetActive(false);
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(NetworkManager.Singleton.IsServer)
+        if(IsServer)
         {
-            if(isGameStart)
+            if(isGameStart.Value)
             {
-                elaspedTime += Time.deltaTime;
-                SetObstacleSpeed();
-                SetRoadSpeed();
-
+                elaspedTime.Value += Time.deltaTime;
+                
                 IsGameEnd();
             }
         }
+
+        SetObstacleSpeed();
+        SetRoadSpeed();
     }
 
     void IsGameEnd()
     {
-        int playerAlive = 0;
-        foreach(CarController car in carList)
-        {
-            if(!car.isDie)
-                playerAlive++;
-        }
-
-        if(playerAlive <= 1)
+        if(playerAlive.Value <= 1)
         {
             //gameend
-            isGameStart = false;
+            isGameStart.Value = false;
+            WinImage.gameObject.SetActive(true);
             StopCoroutine(obstacleSpawner.spawnObstacle);
             obstacleSpawner.DestropAllObstacleRpc();
             playeButton.gameObject.SetActive(true);
@@ -66,12 +69,12 @@ public class GameManager : MonoBehaviour
 
     void SetObstacleSpeed()
     {
-        obstacleSpawner.obstacleSpeed = 5f + (Mathf.Pow(2f,(elaspedTime/100f)));
+        obstacleSpawner.obstacleSpeed = 5f + (Mathf.Pow(2f,(elaspedTime.Value/100f)));
     }
 
     void SetRoadSpeed()
     {
-        roadMoving.scrollSpeed.Value = 1f + (Mathf.Pow(2f,(elaspedTime/100f)));
+        roadMoving.scrollSpeed.Value = 1f + (Mathf.Pow(2f,(elaspedTime.Value/100f)));
     }
 
     public void StartGame()
@@ -88,7 +91,7 @@ public class GameManager : MonoBehaviour
         {
             car.isGameStart.Value = true;
         }
-        isGameStart= true;
+        isGameStart.Value= true;
     }
 
     void ResetGame()
@@ -97,5 +100,11 @@ public class GameManager : MonoBehaviour
         {
             car.ResetGameRpc();
         }
+    }
+
+    public void OnPlayerDie()
+    {
+        playerAlive.Value--;
+        LoseImage.gameObject.SetActive(true);
     }
 }

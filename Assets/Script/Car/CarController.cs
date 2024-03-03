@@ -15,14 +15,14 @@ public class CarController : NetworkBehaviour
 
     Vector2 startPos;
     float maxHitpoint;
+
+    GameManager gameManager;
+
     public override void OnNetworkSpawn()
     {
+        gameManager = FindObjectOfType<GameManager>();
         startPos = transform.position;
         maxHitpoint = hitPoint;
-        if(IsServer)
-        {
-            FindObjectOfType<GameManager>().carList.Add(this);
-        }
     }
 
     void Start()
@@ -69,6 +69,7 @@ public class CarController : NetworkBehaviour
         if(hitPoint <= 0)
         {
             GameOverRpc();
+            gameManager.OnPlayerDie();
         }
     }
 

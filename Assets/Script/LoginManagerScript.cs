@@ -196,6 +196,7 @@ public class LoginManagerScript : NetworkBehaviour
         // once it transitions from true to false the connection approval response will be processed.
         response.Pending = false;
         playerNum.Value++;
+        gameManager.playerAlive.Value++;
     }
 
     public void Client()
