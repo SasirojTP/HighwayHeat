@@ -32,7 +32,8 @@ public class ObstacleSpawner : NetworkBehaviour
         {
             if(Time.time - tempTime > waitTime)
             {
-                SpawnObstacleRpc(obstacleSpeed);
+                int obstacleIndex = Random.Range(0,obstaclePrefabs.Count);
+                SpawnObstacleRpc(obstacleIndex,obstacleSpeed);
                 tempTime = Time.time;
                 waitTime = Random.Range(2f,5f);
             }
@@ -47,10 +48,9 @@ public class ObstacleSpawner : NetworkBehaviour
     }
 
     [Rpc(SendTo.ClientsAndHost)]
-    void SpawnObstacleRpc(float speed)
+    void SpawnObstacleRpc(int obstacleIndex,float speed)
     {
         float yPos = Camera.main.ViewportToWorldPoint(new Vector2(0, Random.Range(0f,1f))).y;
-        int obstacleIndex = Random.Range(0,obstaclePrefabs.Count);
 
         Obstacle _obstacle = Instantiate(obstaclePrefabs[obstacleIndex],new Vector2(spawnPosition.position.x,yPos),Quaternion.identity);
         _obstacle.speed = speed;
