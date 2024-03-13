@@ -9,7 +9,6 @@ public class GameManager : NetworkBehaviour
 {
     public NetworkVariable<float> elaspedTime = new NetworkVariable<float>(0,NetworkVariableReadPermission.Everyone,NetworkVariableWritePermission.Server);
 
-    public ObstacleSpawner obstacleSpawner;
     public RoadMoving roadMoving;
     public LoginManagerScript loginManagerScript;
 
@@ -24,6 +23,8 @@ public class GameManager : NetworkBehaviour
     public TextMeshProUGUI loseText;
 
     public static GameManager inst;
+
+    float tempTime;
 
     private void Awake()
     {
@@ -49,12 +50,11 @@ public class GameManager : NetworkBehaviour
             if(isGameStart.Value)
             {
                 elaspedTime.Value += Time.deltaTime;
-                
+
                 IsGameEnd();
             }
         }
 
-        SetObstacleSpeed();
         SetRoadSpeed();
     }
 
@@ -64,16 +64,10 @@ public class GameManager : NetworkBehaviour
         {
             //gameend
             isGameStart.Value = false;
-            StopCoroutine(obstacleSpawner.spawnObstacle);
-            obstacleSpawner.DestroyAllObstacleRpc();
+            ObstacleSpawner.inst.DestroyAllObstacleRpc();
             playeButton.gameObject.SetActive(true);
             ShowTextEndGameRpc();
         }
-    }
-
-    void SetObstacleSpeed()
-    {
-        obstacleSpawner.obstacleSpeed = 5f + (Mathf.Pow(2f,(elaspedTime.Value/100f)));
     }
 
     void SetRoadSpeed()
@@ -88,8 +82,6 @@ public class GameManager : NetworkBehaviour
 
         playeButton.gameObject.SetActive(false);
         ResetGame();
-        //start game
-        obstacleSpawner.spawnObstacle = StartCoroutine(obstacleSpawner.StartSpawnObstacle());
 
         isGameStart.Value = true;
     }
