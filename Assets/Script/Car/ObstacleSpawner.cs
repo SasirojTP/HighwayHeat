@@ -40,7 +40,7 @@ public class ObstacleSpawner : NetworkBehaviour
     }
 
     [Rpc(SendTo.ClientsAndHost)]
-    public void DestropAllObstacleRpc()
+    public void DestroyAllObstacleRpc()
     {
         foreach(Obstacle obstacle in FindObjectsOfType<Obstacle>())
         {

@@ -11,7 +11,6 @@ public class CarController : NetworkBehaviour
     Rigidbody2D rb;
 
     public bool isDie = false;
-    public NetworkVariable<bool> isGameStart = new NetworkVariable<bool>(false,NetworkVariableReadPermission.Everyone,NetworkVariableWritePermission.Server);
 
     Vector2 startPos;
     float maxHitpoint;
@@ -45,7 +44,7 @@ public class CarController : NetworkBehaviour
 
     void Move()
     {
-        if(isGameStart.Value)
+        if(GameManager.inst.isGameStart.Value)
         {
             float horizontal = Input.GetAxis("Horizontal");
             float vertical = Input.GetAxis("Vertical");
@@ -87,6 +86,5 @@ public class CarController : NetworkBehaviour
         isDie = false;
         GetComponent<SpriteRenderer>().enabled = true;
         hitPoint = maxHitpoint;
-        isGameStart.Value = false;
     }
 }

@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Unity.Netcode;
+using TMPro;
 
 public class GameManager : NetworkBehaviour
 {
     public NetworkVariable<float> elaspedTime = new NetworkVariable<float>(0,NetworkVariableReadPermission.Everyone,NetworkVariableWritePermission.Server);
-
 
     public ObstacleSpawner obstacleSpawner;
     public RoadMoving roadMoving;
@@ -20,11 +20,16 @@ public class GameManager : NetworkBehaviour
 
     public List<CarController> carList = new List<CarController>();
 
-    public Image WinImage;
-    public Image LoseImage;
-    
+    public TextMeshProUGUI winText;
+    public TextMeshProUGUI loseText;
 
-    // Start is called before the first frame update
+    public static GameManager inst;
+
+    private void Awake()
+    {
+        inst = this;
+    }
+
     public void OnCreateServer()
     {
         playeButton.gameObject.SetActive(true);
@@ -33,11 +38,10 @@ public class GameManager : NetworkBehaviour
     void Start()
     {
         playeButton.gameObject.SetActive(false);
-        WinImage.gameObject.SetActive(false);
-        LoseImage.gameObject.SetActive(false);
+        winText.gameObject.SetActive(false);
+        loseText.gameObject.SetActive(false);
     }
 
-    // Update is called once per frame
     void Update()
     {
         if(IsServer)
@@ -60,10 +64,10 @@ public class GameManager : NetworkBehaviour
         {
             //gameend
             isGameStart.Value = false;
-            WinImage.gameObject.SetActive(true);
             StopCoroutine(obstacleSpawner.spawnObstacle);
-            obstacleSpawner.DestropAllObstacleRpc();
+            obstacleSpawner.DestroyAllObstacleRpc();
             playeButton.gameObject.SetActive(true);
+            ShowTextEndGameRpc();
         }
     }
 
@@ -87,11 +91,7 @@ public class GameManager : NetworkBehaviour
         //start game
         obstacleSpawner.spawnObstacle = StartCoroutine(obstacleSpawner.StartSpawnObstacle());
 
-        foreach(CarController car in carList)
-        {
-            car.isGameStart.Value = true;
-        }
-        isGameStart.Value= true;
+        isGameStart.Value = true;
     }
 
     void ResetGame()
@@ -105,6 +105,27 @@ public class GameManager : NetworkBehaviour
     public void OnPlayerDie()
     {
         playerAlive.Value--;
-        LoseImage.gameObject.SetActive(true);
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    void ShowTextEndGameRpc()
+    {
+        foreach(CarController n in carList)
+        {
+            if (n.IsOwner == true)
+            {
+                if(n.isDie == true)
+                {
+                    winText.gameObject.SetActive(false);
+                    loseText.gameObject.SetActive(true);
+                }
+                else
+                {
+                    winText.gameObject.SetActive(false);
+                    loseText.gameObject.SetActive(true);
+                }
+                print(n.isDie);
+            }
+        }
     }
 }

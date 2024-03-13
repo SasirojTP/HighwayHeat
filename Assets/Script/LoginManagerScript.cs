@@ -141,7 +141,7 @@ public class LoginManagerScript : NetworkBehaviour
             randomCode[i] = character[UnityEngine.Random.Range(0, character.Length)];
         }
         return new NetworkString() { info = new FixedString32Bytes(new string(randomCode)) };
-}
+    }
 
     private void ApprovalCheck(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
     {
@@ -153,7 +153,6 @@ public class LoginManagerScript : NetworkBehaviour
 
         int byteLength = connectionData.Length;
         bool isApproved = false;
-        int characterPrefabIndex = 0;
         if (byteLength > 0)
         {
             string combinedString = System.Text.Encoding.ASCII.GetString(connectionData, 0, byteLength);
@@ -168,7 +167,6 @@ public class LoginManagerScript : NetworkBehaviour
                     isApproved = ApproveConnection(clientData, hostData);
                 }
                 else if (i == 1){
-                    //characterPrefabIndex = int.Parse(extractedStrings[i]);
                     isApproved = ApproveJoinCode(clientData , hostJoinCode.Value);
                 }
                 
