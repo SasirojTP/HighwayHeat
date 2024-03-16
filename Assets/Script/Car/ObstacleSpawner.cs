@@ -18,7 +18,6 @@ public class ObstacleSpawner : NetworkBehaviour
 
     float waitTime = 1f;
 
-    // Start is called before the first frame update
     void Awake()
     {
         inst = this;
@@ -37,7 +36,6 @@ public class ObstacleSpawner : NetworkBehaviour
                 tempTime = Time.time;
                 waitTime = Random.Range(2f,5f);
             }
-
             SetObstacleSpeed();
         }
     }
@@ -50,9 +48,9 @@ public class ObstacleSpawner : NetworkBehaviour
     [Rpc(SendTo.ClientsAndHost)]
     void SpawnObstacleRpc(int obstacleIndex,float speed)
     {
-        float yPos = Camera.main.ViewportToWorldPoint(new Vector2(0, Random.Range(0f,1f))).y;
+        float yPos = Camera.main.ViewportToWorldPoint(new Vector2(0, Random.Range(0f,.5f))).y;
 
-        Obstacle _obstacle = Instantiate(obstaclePrefabs[obstacleIndex],new Vector2(spawnPosition.position.x,yPos),Quaternion.identity);
+        Obstacle _obstacle = Instantiate(obstaclePrefabs[obstacleIndex],new Vector2(spawnPosition.position.x,yPos),spawnPosition.transform.rotation);
         _obstacle.speed = speed;
         _obstacle.timeElasped = yPos;
     }

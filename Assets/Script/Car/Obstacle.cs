@@ -18,9 +18,9 @@ public class Obstacle : MonoBehaviour
     {
         IsOutOffScreen();
         timeElasped += Time.deltaTime;
-        float viewportPos = Mathf.PingPong(timeElasped,1);
-        float yPos = Camera.main.ViewportToWorldPoint(new Vector3(0, viewportPos,1)).y;
-        transform.Translate(Vector2.left * speed * Time.deltaTime);
+        float viewportPos = Mathf.PingPong(timeElasped,.5f);
+        float yPos = Camera.main.ViewportToWorldPoint(new Vector3(0, viewportPos + 0.1f,1)).y;
+        transform.Translate(Vector2.left * -speed * Time.deltaTime);
         transform.position = new Vector3(transform.position.x,yPos,0);
     }
 
@@ -30,14 +30,12 @@ public class Obstacle : MonoBehaviour
 
         if (viewportPosition.x < 0)
         {
-            // Destroy the object
             Destroy(gameObject);
         }
     }
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        //make damage to car
         if(other.CompareTag("Car"))
         {
             if(!other.GetComponent<CarController>().isDie)

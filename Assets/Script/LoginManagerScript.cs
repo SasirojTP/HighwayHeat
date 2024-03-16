@@ -11,12 +11,14 @@ using UnityEngine.SceneManagement;
 public class LoginManagerScript : NetworkBehaviour
 {
     [Header ("Variable")]
-    //public int playerNum = 0;
-    //string hostJoinCode;
     public NetworkVariable<int> playerNum = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
     public NetworkVariable<NetworkString> hostJoinCode = new NetworkVariable<NetworkString>(
         new NetworkString { info = "Code" }, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
-    private bool isApproveConnection = false;
+    public NetworkVariable<bool> isJoinCodeCorrect = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+
+    public GameManager gameManager;
+    UInt32 playerColor = 1652872834;
+    bool isApproveConnection = false;
 
     public List<Transform> startPosition = new List<Transform>();
 
@@ -31,12 +33,12 @@ public class LoginManagerScript : NetworkBehaviour
     public GameObject loginPanel;
     public GameObject leaveButton;
     public GameObject lobbyPanel;
-    public TMP_InputField userNameInputField;
     public TMP_InputField joinCodeInputField;
     [SerializeField] TMP_Text gameCodeText;
     [SerializeField] TMP_Text playerAmountText;
+    [SerializeField] GameObject popUpPanel;
+    [SerializeField] TextMeshProUGUI errorText;
 
-    public GameManager gameManager;
 
     public struct NetworkString : INetworkSerializable
     {
@@ -62,6 +64,7 @@ public class LoginManagerScript : NetworkBehaviour
         NetworkManager.Singleton.OnClientDisconnectCallback += HandleClientDisconnect;
         loginPanel.SetActive(true);
         lobbyPanel.SetActive(false);
+        popUpPanel.SetActive(false);
     }
 
     private void Update()
@@ -73,7 +76,6 @@ public class LoginManagerScript : NetworkBehaviour
     private void HandleClientDisconnect(ulong clientId)
     {
         Debug.Log("HandleClientDisconnect client ID = " + clientId);
-        //DecreasePlayerRpc();
         if (NetworkManager.Singleton.IsHost) { playerNum.Value--; }
         else if (NetworkManager.Singleton.IsClient) { Leave(); }
     }
@@ -84,14 +86,21 @@ public class LoginManagerScript : NetworkBehaviour
         {
             NetworkManager.Singleton.Shutdown(); // shutdown
             NetworkManager.Singleton.ConnectionApprovalCallback -= ApprovalCheck;
+            SceneManager.LoadScene(0);
 
         }
         else if (NetworkManager.Singleton.IsClient)
         {
+            if (isJoinCodeCorrect.Value == true)
+            {
+                SceneManager.LoadScene(0);
+            }
+            else
+            {
+                PopUpJoinCodeIncorrect();
+            }
             NetworkManager.Singleton.Shutdown(); // shutdown
-        } 
-        // show login panel
-        SceneManager.LoadScene(0);
+        }
         loginPanel.SetActive(true);
         lobbyPanel.SetActive(false);
     }
@@ -133,7 +142,7 @@ public class LoginManagerScript : NetworkBehaviour
 
     NetworkString RandomJoinCode()
     {
-        var character = "abcdefghijklmnopqrstuvwxyz0123456789";
+        var character = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         var codeLength = 6;
         var randomCode = new char[codeLength];
         for (int i = 0; i < codeLength; i++)
@@ -156,21 +165,8 @@ public class LoginManagerScript : NetworkBehaviour
         if (byteLength > 0)
         {
             string combinedString = System.Text.Encoding.ASCII.GetString(connectionData, 0, byteLength);
-            string[] extractedStrings = HelperScript.ExtractStrings(combinedString);
-            
-            for (int i = 0; i < extractedStrings.Length; i++)
-            {
-                string clientData = extractedStrings[i];
-                if (i == 0)
-                {
-                    string hostData = userNameInputField.GetComponent<TMP_InputField>().text;
-                    isApproved = ApproveConnection(clientData, hostData);
-                }
-                else if (i == 1){
-                    isApproved = ApproveJoinCode(clientData , hostJoinCode.Value);
-                }
-                
-            }
+            isApproved = ApproveJoinCode(combinedString, hostJoinCode.Value);
+            SetPlayerCarColor();
         }
 
         // Your approval logic determines the following values
@@ -179,7 +175,7 @@ public class LoginManagerScript : NetworkBehaviour
 
         // The Prefab hash value of the NetworkPrefab, if null the default NetworkManager player Prefab is used
         //response.PlayerPrefabHash = null;
-        response.PlayerPrefabHash = null;
+        response.PlayerPrefabHash = playerColor;
         // Position to spawn the player object (if null it uses default of Vector3.zero)
         response.Position = startPosition[playerNum.Value].position;
 
@@ -199,36 +195,34 @@ public class LoginManagerScript : NetworkBehaviour
 
     public void Client()
     {
-        string userName = userNameInputField.GetComponent<TMP_InputField>().text;
         string hostJoinCode = joinCodeInputField.GetComponent<TMP_InputField>().text;
-        string[] inputFields = { userName , hostJoinCode };
-        string clientData = HelperScript.CombineStrings(inputFields);
-        print(clientData);
-        NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(clientData);
+        NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(hostJoinCode);
         NetworkManager.Singleton.StartClient();
         Debug.Log("start client");
-    }
-
-    public bool ApproveConnection(string clientData, string hostData)
-    {
-        bool isApprove = System.String.Equals(clientData.Trim(), hostData.Trim()) ? false : true;
-        Debug.Log("isApprove = " + isApprove);
-
-        return isApprove && (playerNum.Value < 4);
     }
 
     bool ApproveJoinCode(NetworkString clientJoinCode, NetworkString hostJoinCode)
     {
         bool isApprove = System.String.Equals(clientJoinCode.info.ToString().Trim(), hostJoinCode.info.ToString().Trim()) ? true : false;
-        if(isApprove == true)
+        if (isApprove == true)
         {
             gameCodeText.text = "Game Code: " + hostJoinCode.info;
+            isJoinCodeCorrect.Value = true;
             print("Game Code: " + hostJoinCode.info);
+        }
+        else
+        {
+            isJoinCodeCorrect.Value = false;
         }
         Debug.Log("ApproveJoinCode = " + isApprove);
         return isApprove;
     }
 
+    void PopUpJoinCodeIncorrect()
+    {
+        popUpPanel.SetActive(true);
+        errorText.text = "Code incorrect";
+    }
     void UpdateGameCodeText()
     {
         gameCodeText.text = "Game Code: " + hostJoinCode.Value;
@@ -237,6 +231,25 @@ public class LoginManagerScript : NetworkBehaviour
     void UpdatePlayerAmountText()
     {
         playerAmountText.text = "Player " + playerNum.Value.ToString() + "/4";
+    }
+
+    void SetPlayerCarColor()
+    {
+        switch (playerNum.Value)
+        {
+            case 0:
+                playerColor = 1652872834;
+                break;
+            case 1:
+                playerColor = 1158519564;
+                break;
+            case 2:
+                playerColor = 676951331;
+                break;
+            case 3:
+                playerColor = 3589217347;
+                break;
+        }
     }
 
     public void OnClickQuitButton()

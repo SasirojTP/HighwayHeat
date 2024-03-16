@@ -10,9 +10,10 @@ public class GameManager : NetworkBehaviour
     public NetworkVariable<float> elaspedTime = new NetworkVariable<float>(0,NetworkVariableReadPermission.Everyone,NetworkVariableWritePermission.Server);
 
     public RoadMoving roadMoving;
+    public RoadMoving buildingMoving;
     public LoginManagerScript loginManagerScript;
 
-    public Button playeButton;
+    public Button playButton;
 
     public NetworkVariable<bool> isGameStart = new NetworkVariable<bool>(false,NetworkVariableReadPermission.Everyone,NetworkVariableWritePermission.Server);
     public NetworkVariable<int> playerAlive = new NetworkVariable<int>(0,NetworkVariableReadPermission.Everyone,NetworkVariableWritePermission.Server);
@@ -33,12 +34,12 @@ public class GameManager : NetworkBehaviour
 
     public void OnCreateServer()
     {
-        playeButton.gameObject.SetActive(true);
+        playButton.gameObject.SetActive(true);
     }
 
     void Start()
     {
-        playeButton.gameObject.SetActive(false);
+        playButton.gameObject.SetActive(false);
         winText.gameObject.SetActive(false);
         loseText.gameObject.SetActive(false);
     }
@@ -54,8 +55,7 @@ public class GameManager : NetworkBehaviour
                 IsGameEnd();
             }
         }
-
-        SetRoadSpeed();
+        SetEnvironmentSpeed();
     }
 
     void IsGameEnd()
@@ -65,14 +65,15 @@ public class GameManager : NetworkBehaviour
             //gameend
             isGameStart.Value = false;
             ObstacleSpawner.inst.DestroyAllObstacleRpc();
-            playeButton.gameObject.SetActive(true);
+            playButton.gameObject.SetActive(true);
             ShowTextEndGameRpc();
         }
     }
 
-    void SetRoadSpeed()
+    void SetEnvironmentSpeed()
     {
-        roadMoving.scrollSpeed.Value = 1f + (Mathf.Pow(2f,(elaspedTime.Value/100f)));
+        roadMoving.scrollSpeed.Value = (1f + (Mathf.Pow(2f,(elaspedTime.Value/100f)))) /3;
+        buildingMoving.scrollSpeed.Value = -((1f + (Mathf.Pow(2f, (elaspedTime.Value / 100f))))) /6;
     }
 
     public void StartGame()
@@ -80,23 +81,23 @@ public class GameManager : NetworkBehaviour
         if(loginManagerScript.playerNum.Value < 2)
             return;
 
-        playeButton.gameObject.SetActive(false);
-        ResetGame();
-
-        isGameStart.Value = true;
-    }
-
-    void ResetGame()
-    {
-        foreach(CarController car in carList)
+        playButton.gameObject.SetActive(false);
+        foreach (CarController car in carList)
         {
             car.ResetGameRpc();
         }
+        playerAlive.Value = carList.Count;
+        HideTextRpc();
+        isGameStart.Value = true;
     }
 
-    public void OnPlayerDie()
+    [Rpc(SendTo.ClientsAndHost)]
+    public void OnPlayerDieRpc()
     {
-        playerAlive.Value--;
+        if (IsServer)
+        {
+            playerAlive.Value--;
+        }
     }
 
     [Rpc(SendTo.ClientsAndHost)]
@@ -113,11 +114,17 @@ public class GameManager : NetworkBehaviour
                 }
                 else
                 {
-                    winText.gameObject.SetActive(false);
-                    loseText.gameObject.SetActive(true);
+                    winText.gameObject.SetActive(true);
+                    loseText.gameObject.SetActive(false);
                 }
-                print(n.isDie);
             }
         }
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    void HideTextRpc()
+    {
+        winText.gameObject.SetActive(false);
+        loseText.gameObject.SetActive(false);
     }
 }
