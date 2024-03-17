@@ -883,6 +883,26 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 360578508}
+    - target: {fileID: 6994411529437948640, guid: af7412dfa099e4ca4bc359b27432db92, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6994411529437948640, guid: af7412dfa099e4ca4bc359b27432db92, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 843217072}
+    - target: {fileID: 6994411529437948640, guid: af7412dfa099e4ca4bc359b27432db92, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: OnClickLoadSceneButton
+      objectReference: {fileID: 0}
+    - target: {fileID: 6994411529437948640, guid: af7412dfa099e4ca4bc359b27432db92, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: PopUpPanel, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 6994411529437948640, guid: af7412dfa099e4ca4bc359b27432db92, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -898,6 +918,17 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 1778629639558133125, guid: af7412dfa099e4ca4bc359b27432db92, type: 3}
   m_PrefabInstance: {fileID: 503402358}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &503402361 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6994411529437948640, guid: af7412dfa099e4ca4bc359b27432db92, type: 3}
+  m_PrefabInstance: {fileID: 503402358}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &555416345
 GameObject:
   m_ObjectHideFlags: 0
@@ -1362,6 +1393,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   okButton: {fileID: 1587154807}
+  refreshButton: {fileID: 503402361}
 --- !u!1001 &887354767
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2354,7 +2386,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1587154808}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 843217072}
+        m_TargetAssemblyTypeName: PopUpPanel, Assembly-CSharp
+        m_MethodName: OnClickLoadSceneButton
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1587154808
 MonoBehaviour:
   m_ObjectHideFlags: 0
