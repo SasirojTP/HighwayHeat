@@ -24,6 +24,10 @@ public class GameManager : NetworkBehaviour
     public TextMeshProUGUI loseText;
 
     public static GameManager inst;
+    [SerializeField] GameObject vulnerableTimeGroup;
+    [SerializeField] TMP_InputField inputField_VulnerableTime;
+
+    [SerializeField] TMP_Dropdown dropdown;
 
     float tempTime;
 
@@ -35,6 +39,8 @@ public class GameManager : NetworkBehaviour
     public void OnCreateServer()
     {
         playButton.gameObject.SetActive(true);
+        vulnerableTimeGroup.SetActive(true);
+        inputField_VulnerableTime.gameObject.SetActive(true);
     }
 
     void Start()
@@ -42,6 +48,8 @@ public class GameManager : NetworkBehaviour
         playButton.gameObject.SetActive(false);
         winText.gameObject.SetActive(false);
         loseText.gameObject.SetActive(false);
+        vulnerableTimeGroup.SetActive(false);
+        inputField_VulnerableTime.gameObject.SetActive(false);
     }
 
     void Update()
@@ -66,6 +74,8 @@ public class GameManager : NetworkBehaviour
             isGameStart.Value = false;
             ObstacleSpawner.inst.DestroyAllObstacleRpc();
             playButton.gameObject.SetActive(true);
+            vulnerableTimeGroup.SetActive(true);
+            inputField_VulnerableTime.gameObject.SetActive(true);
             ShowTextEndGameRpc();
         }
     }
@@ -89,6 +99,23 @@ public class GameManager : NetworkBehaviour
         playerAlive.Value = carList.Count;
         HideTextRpc();
         isGameStart.Value = true;
+        StartCoroutine(SetCarHealth());
+        vulnerableTimeGroup.SetActive(false);
+        inputField_VulnerableTime.gameObject.SetActive(false);
+    }
+
+    IEnumerator SetCarHealth()
+    {
+        yield return new WaitForSeconds(float.Parse(inputField_VulnerableTime.text));
+        SetAllCarHealthToOne();
+    }
+
+    void SetAllCarHealthToOne()
+    {
+        foreach (CarController car in carList)
+        {
+            car.SetCarHealthToOneRpc();
+        }
     }
 
     [Rpc(SendTo.ClientsAndHost)]
@@ -127,4 +154,5 @@ public class GameManager : NetworkBehaviour
         winText.gameObject.SetActive(false);
         loseText.gameObject.SetActive(false);
     }
+
 }
